@@ -33,7 +33,7 @@ export default {
     //  await this.$store.dispatch(types.GET_FRIEND_POSTS)
     //  });
 
-     this.$store.dispatch(types.GET_FRIEND_POSTS)
+     this.$store.dispatch(types.GET_FRIEND_POSTS, 0)
 
     // axios
     //   .get("http://localhost:3000/post/friends-post", {
@@ -85,13 +85,15 @@ export default {
           $(document).height() - 100
         ) {
           console.log(" bottom!");
-          t.index += 3;
+          t.index += 2;
           t.$store.dispatch(types.GET_FRIEND_POSTS, t.index);
         }
       });
     },
   },
-  mounted() {},
+  mounted() {
+    this.scroll()
+  },
   components: {
     "my-post": Post,
   },
