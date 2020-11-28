@@ -13,11 +13,6 @@
           </v-container>
           <v-card-text> description </v-card-text>
           <v-card-actions>
-            <!-- <v-chip small color="secondary" class="white--text">
-                    article.source.name
-                  </v-chip> -->
-            <!--  -->
-
             <v-row style="padding: 10px">
               <v-dialog v-model="dialog" persistent max-width="600px">
                 <template v-slot:activator="{ on, attrs }">
@@ -32,15 +27,13 @@
                   <v-card-text>
                     <v-container>
                       <v-row>
-
-                        <v-col cols="12" >
+                        <v-col cols="12">
                           <v-text-field
                             label="leave comment"
                             required
                             v-model="comment"
                           ></v-text-field>
                         </v-col>
-                       
                       </v-row>
                     </v-container>
                   </v-card-text>
@@ -49,7 +42,14 @@
                     <v-btn color="blue darken-1" text @click="dialog = false">
                       Close
                     </v-btn>
-                    <v-btn color="blue darken-1" text @click="dialog = false">
+                    <v-btn
+                      color="blue darken-1"
+                      text
+                      @click="
+                        addComment({ comment: comment, postID: id });
+                        dialog = false;
+                      "
+                    >
                       Save
                     </v-btn>
                   </v-card-actions>
@@ -79,6 +79,58 @@
               >Read More</v-btn
             >
           </v-card-actions>
+
+          <v-row align="center">
+            <v-col cols="12">
+              <div id="root">
+                <v-card @click="showPosts" class="mx-auto">
+                  <v-toolbar color="cyan" dark>
+                    <v-app-bar-nav-icon></v-app-bar-nav-icon>
+
+                    <v-toolbar-title>Comments</v-toolbar-title>
+
+                    <v-spacer></v-spacer>
+
+                    <v-btn icon>
+                      <v-icon>mdi-magnify</v-icon>
+                    </v-btn>
+                  </v-toolbar>
+
+                  <v-list v-if="showHidePosts" three-line>
+                    <template v-for="(item, index) in commentsArr">
+                      <v-subheader
+                        v-if="item.header"
+                        :key="item.header"
+                        v-text="item.header"
+                      ></v-subheader>
+
+                      <v-divider :key="index" :inset="item.inset"></v-divider>
+
+                      <v-list-item :key="item.title">
+                        <v-list-item-avatar>
+                          <v-img
+                            :src="
+                              'http://localhost:3000/profile-image/' +
+                              item.user +
+                              '.PNG'"
+                          ></v-img>
+                        </v-list-item-avatar>
+
+                        <v-list-item-content>
+                          <v-list-item-title
+                            v-html="item.content"
+                          ></v-list-item-title>
+                         
+                            {{item.date | date}}
+                         
+                        </v-list-item-content>
+                      </v-list-item>
+                    </template>
+                  </v-list>
+                </v-card>
+              </div>
+            </v-col>
+          </v-row>
         </v-card>
       </div>
     </v-flex>
@@ -86,17 +138,60 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from "vuex";
+// import types from '../../store/types'
+import io from "socket.io-client";
+
+import * as Types from "../../store/types";
 export default {
   props: {
+    id: String,
     text: String,
     image: String,
+    commentsArr: Array,
+    items: [],
   },
   data() {
     return {
       dialog: false,
-      comment: ''
+      comment: "",
+      showHidePosts: false,
+       socket: io("http://localhost:3000", {
+        query: { token: localStorage.getItem("token") },
+    }),
     };
   },
+
+  computed: {
+    ...mapGetters({
+      // getCommentsGetter: Types.GET_COMMENTS,
+    }),
+  },
+  methods: {
+    ...mapActions({
+      // addComment: Types.ADD_COMMENT,
+      getCommets: Types.GET_COMMENTS,
+     
+    }),
+     addComment(data) {
+       this.socket.emit('new-comment', data)
+          // console.log('App.vue addComment555', data)
+      },
+    showPosts() {
+      this.showHidePosts = !this.showHidePosts;
+    },
+  },
+ created() {
+   
+   this.socket.on('new-comment',  data => {
+     console.log('post.veu data', data)
+     this.$store.commit('addComment', data)
+   })
+  //  this.socket.on('new-comment', (d) => {
+  //     this.$store.commit('addComment', d)
+  //     console.log('App vue socket new-comment', d)
+  //   })
+ }
 };
 </script>
 

@@ -1,9 +1,11 @@
 <template>
   <div>
-    <div v-for="(post, index) in posts" :key="index" @click="inPostClick(post)">
+    <div v-for="post in posts" :key="post._id" @click="inPostClick(post)">
       <my-post
         :image="'http://localhost:3000/static/' + post._id + '.PNG'"
         :text="post.text"
+        :id="post._id"
+        :commentsArr="post.comments"
       >
       </my-post>
     </div>
@@ -12,6 +14,7 @@
 
 <script>
 import Post from "./post";
+// import { mapActions } from "vuex";
 import * as types from "../../store/types";
 // import axios from "axios";
 global.jQuery = require("jquery");
@@ -23,59 +26,23 @@ export default {
     index: 0,
     // posts: [],
   }),
-    computed: {
-      posts() {
-        return this.$store.getters.getPosts;
-      },
+  computed: {
+    posts() {
+      return this.$store.getters.getPosts;
     },
-  created() {
-    // await this.$store.dispatch("getPostsHttp", 0).then(async() => {
-    //  await this.$store.dispatch(types.GET_FRIEND_POSTS)
-    //  });
 
-     this.$store.dispatch(types.GET_FRIEND_POSTS, 0)
-
-    // axios
-    //   .get("http://localhost:3000/post/friends-post", {
-    //     headers: {
-    //       authorization: localStorage.getItem("token"),
-    //     },
-    //   })
-    //   .then((res) => {
-    //     console.log("posts.vue aaa", res.data);
-    //     this.posts = res.data;
-    //   });
+    comments() {
+      return ["aa", "bb"];
+    },
   },
+  created() {
+    this.$store.dispatch(types.GET_FRIEND_POSTS, 0);
+  },
+
   methods: {
     inPostClick(post) {
-      console.log("Posts.vue", post);
+      console.log("Posts.vue inPostClick", post);
     },
-    //  scroll() {
-    //   let t = this
-    //   $(window).scroll(function() {
-    //     if($(window).scrollTop() + $(window).height() == $(document).height()) {
-    //        // console.log('App.vue scroll()', 'end')
-    //         t.index += 3;
-    //         console.log('Posts index end of page', t.index);
-    //         t.$store.dispatch('getPostsHttp', t.index);
-    //     }
-    //   });
-    //  },
-
-    // worked
-    // scroll() {
-    //     let t =this
-    //   $(window).scroll(function () {
-    //     if (
-    //       $(window).scrollTop() + $(window).height() >
-    //       $(document).height() - 100
-    //     ) {
-    //       console.log("near bottom!");
-    //       t.index += 3;
-    //       t.$store.dispatch('getPostsHttp', t.index);
-    //     }
-    //   });
-    // },
 
     scroll() {
       let t = this;
@@ -92,11 +59,14 @@ export default {
     },
   },
   mounted() {
-    this.scroll()
+    this.scroll();
   },
   components: {
     "my-post": Post,
   },
+beforeDestroy () {
+ this.$router.go()
+},
 };
 </script>
 

@@ -28,7 +28,8 @@ export default new Vuex.Store({
     // friendRequest: localStorage.getItem("friendRequest"),
     httpFriendRequest: null,
     friendsList: [],
-    isFriend: false
+    isFriend: false,
+    comments: []
   },
   getters: {
     getAuth() {
@@ -56,10 +57,18 @@ export default new Vuex.Store({
       return state.httpFriendRequest;
     },
     [types.GET_FRIENDS_LIST]: (state) => {
+      
+      
       return state.friendsList;
     },
     [types.IS_FRIEND]: (state) => {
       return state.isFriend;
+    },
+    [types.ADD_COMMENT]: (state) => {
+      return state.comments
+    },
+    [types.GET_COMMENTS]: (state) => {
+      return state.comments
     }
   },
   mutations: {
@@ -142,28 +151,42 @@ export default new Vuex.Store({
     [types.REMOVE_ADD_REQUEST]: (state, id) => {
       for (let i = 0; i < state.httpFriendRequest.length; i++) {
         if (state.httpFriendRequest[i].id == id) {
-          console.log('index345', id, state.httpFriendRequest)
+          // console.log('index345', id, state.httpFriendRequest)
           state.httpFriendRequest.splice(state.httpFriendRequest.indexOf(i), 1)
           state.friendRequestLength--
         }
        
         // state.httpFriendRequest.splice(state.httpFriendRequest.index)
       }
-      console.log('index888', id, state.httpFriendRequest)
+      // console.log('index888', id, state.httpFriendRequest)
     },
     [types.REMOVE_ADD_REQUEST_ONE]: (state, id) => {
       console.log('vuex REMOVE_ADD_REQUEST_ONE:', state.httpFriendRequest.indexOf(id))
       state.httpFriendRequest.splice(state.httpFriendRequest.indexOf(id), 1)
       state.friendRequestLength--
-      console.log('', id)
+      // console.log('', id)
     },
     [types.GET_FRIEND_POSTS]: (state, payload) => {
-      console.log('vuex mutauion types.GET_FRIEND_POSTS', payload)
+      // console.log('vuex mutauion types.GET_FRIEND_POSTS', payload)
       if (!payload.success) {
         state.posts.push(...payload)
       } else {
         return
       }
+    },
+    'addComment': (state, payload) => {
+       let posts = state.posts
+      for (let i = 0; i < posts.length; i++) {
+        if (posts[i]._id == payload.post) {
+          posts[i].comments.push(payload);
+       }
+      }
+      console.log('vuex comment posts', posts)
+
+    },
+    [types.GET_COMMENTS]: (state, payload) => {
+      console.log('vuex mutation GET_COMMENT', payload)
+      state.comments.push(payload)
     }
   },
 
@@ -234,7 +257,7 @@ export default new Vuex.Store({
           })
           .then((res) => {
             resolve(res)
-            console.log('vuex index', res)
+            // console.log('vuex index', res)
             commit("get-Posts-Http", res);
 
           });
@@ -270,7 +293,6 @@ export default new Vuex.Store({
           }
         )
         .then((response) => {
-          console.log('Vuex action new-request', response)
           if (response) {
             commit(types.ADD_REQUEST, id);
             socket.emit('new-fr-req', id)
@@ -342,7 +364,6 @@ export default new Vuex.Store({
         }
       }).then((res) => {
         if (res.data.success) {
-          console.log('Vuex action remove', res.data.success)
           arr.find((item) => {
             if (item == id) {
               arr.splice(arr.indexOf(item), 1)
@@ -364,7 +385,6 @@ export default new Vuex.Store({
         }
         }).then(res => {
           commit(types.REMOVE_ADD_REQUEST_ONE, res.data)
-          console.log(res.data)
       })
     },
     [types.GET_FRIEND_POSTS]: ({commit}, index) => {
@@ -377,7 +397,25 @@ export default new Vuex.Store({
         }).then(res => {
           commit(types.GET_FRIEND_POSTS, res.data)
         })
-    }
+    },
+    [types.ADD_COMMENT]: ({ commit }, { comment, postID }) => {
+      socket.emit('new-comment', { comment, postID })
+      commit(types.ADD_COMMENT, { comment, postID})
+    },
+    
+
+    [types.GET_COMMENTS]: ({ commit }, index) => {
+      axios.get('http://localhost:3000/comment/get-comments',
+        {
+          headers: {
+            postid: index,
+            authorization: localStorage.getItem("token"),
+          }
+        }).then(res => {
+           console.log('vuex types.GET_COMMENTS', res.data)
+          commit(types.GET_COMMENTS, res.data)
+        })
+    },
 
   }
 });

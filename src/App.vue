@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <router-view v-if="!isAuth"></router-view>
-    <div id="app" v-else>
+    <div id="app" v-else>v-else
       <v-app id="inspire">
         <v-app id="inspire">
           <v-navigation-drawer
@@ -343,7 +343,7 @@ export default {
     },
 
     currentRouteName() {
-      console.log("App.vue current route", this.$route.name);
+      // console.log("App.vue current route", this.$route.name);
       return this.$route.name;
     },
   },
@@ -367,6 +367,7 @@ export default {
       console.log("Appvue socket 990", data);
       this.$store.commit(types.REQUEST_SOCKET, data);
     });
+
 
     // axios.post(
     //   "http://localhost:3000/friend-request/request-pending",

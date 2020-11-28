@@ -12,4 +12,6 @@ export const GET_FRIEND_REQUEST_SOCKET = "fetFriendRequestSocket";
 export const REMOVE_ADD_REQUEST = "removeAddRequest";
 export const REMOVE_ADD_REQUEST_ONE = "removeAddRequestOne";
 export const GET_FRIEND_POSTS = "getFriendPost";
+export const ADD_COMMENT = "addComment";
+export const GET_COMMENTS = "getComments";
 

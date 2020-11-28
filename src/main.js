@@ -14,6 +14,18 @@ Vue.use(Vuelidate);
 Vue.use(VueWindowSize);
 Vue.use(CountryFlag);
 
+Vue.filter('date', function (value) {
+  let a = new Date(value);
+  console.log('')
+  let c = new Date();
+  if (a.getTime() == c.getTime()) {
+    return 'today'
+  }
+  else {
+    return value;
+  }
+})
+
 export const eventBus = new Vue({
 
   methods: {
