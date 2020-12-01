@@ -343,13 +343,14 @@ export default {
     },
 
     currentRouteName() {
-      // console.log("App.vue current route", this.$route.name);
+      console.log("App.vue current route", this.$route.name);
       return this.$route.name;
     },
   },
   created() {
     this.currentRouteName;
     this.socket.on("new-post", (post) => {
+      console.log('App.vue new-post13333333', post)
       this.$store.dispatch("newPost", post);
     });
     this.$store.dispatch("socketOnReceive");

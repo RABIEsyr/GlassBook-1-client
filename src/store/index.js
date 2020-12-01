@@ -29,7 +29,7 @@ export default new Vuex.Store({
     httpFriendRequest: null,
     friendsList: [],
     isFriend: false,
-    comments: []
+    comments: [],
   },
   getters: {
     getAuth() {
@@ -41,6 +41,15 @@ export default new Vuex.Store({
     getPosts(state) {
       let unique = [...new Set(state.posts)];
 
+      // for (let i = 0; i < unique.length; i++) {
+      //   for (let j = 0; j < unique[i].comments.length; j++) {
+      //     for (let k = 0; k < unique[i].comments.length - 1; k++) {
+      //       if (unique[i].comments[j]._id == unique[i].comments[k]._id) {
+      //         unique[i].comments.splice(k, 1);
+      //       }
+      //     }
+      //   }
+      // }
       return unique;
     },
     getUserSrchPic(state) {
@@ -57,19 +66,17 @@ export default new Vuex.Store({
       return state.httpFriendRequest;
     },
     [types.GET_FRIENDS_LIST]: (state) => {
-      
-      
       return state.friendsList;
     },
     [types.IS_FRIEND]: (state) => {
       return state.isFriend;
     },
     [types.ADD_COMMENT]: (state) => {
-      return state.comments
+      return state.comments;
     },
     [types.GET_COMMENTS]: (state) => {
-      return state.comments
-    }
+      return state.comments;
+    },
   },
   mutations: {
     Signup: (state, payload) => {
@@ -78,11 +85,11 @@ export default new Vuex.Store({
     Login: (state, payload) => {
       state.auth.id = payload.userId;
     },
-    UploadPhotoToserver: () => { },
+    UploadPhotoToserver: () => {},
     GetPhotoFromServer: (state, payload) => {
       state.photo = payload;
     },
-    socketsendMessage: () => { },
+    socketsendMessage: () => {},
     // "get-Posts": (state, payload) => {
     //   //state.posts.push(payload);
     // },
@@ -109,18 +116,14 @@ export default new Vuex.Store({
       state.searchUserPic = payload;
     },
     [types.ADD_REQUEST]: (state, id) => {
-
-      console.log('Vuex action id 333444', id)
+      console.log("Vuex action id 333444", id);
       let friendRequest = localStorage.getItem("friendRequest");
-      if (friendRequest === null) friendRequest = ""
+      if (friendRequest === null) friendRequest = "";
       localStorage.setItem("friendRequest", friendRequest + "," + id);
-
-
 
       // }
     },
     [types.GET_FRIEND_REQUEST_LENGTH]: (state, payload) => {
-
       state.friendRequestLength = payload;
     },
     [types.INITIAL_REQUEST]: () => {
@@ -138,58 +141,61 @@ export default new Vuex.Store({
       state.friendsList = friends;
     },
     [types.REMOVE_SUBMITTED_REQUEST_FRIEND]: (state, payload) => {
-      console.log('Vuex mutation 11: ', payload)
-      state.isFriend = payload
+      console.log("Vuex mutation 11: ", payload);
+      state.isFriend = payload;
     },
 
     [types.REQUEST_SOCKET]: (state, payload) => {
-      console.log('Vuex mutation request socket 345,: ', payload)
-      state.friendRequestLength += + 0.5
-      console.log('vuex mutatuins request_socket 666', state.friendRequestLength)
-
+      console.log("Vuex mutation request socket 345,: ", payload);
+      state.friendRequestLength += +0.5;
+      console.log(
+        "vuex mutatuins request_socket 666",
+        state.friendRequestLength
+      );
     },
     [types.REMOVE_ADD_REQUEST]: (state, id) => {
       for (let i = 0; i < state.httpFriendRequest.length; i++) {
         if (state.httpFriendRequest[i].id == id) {
           // console.log('index345', id, state.httpFriendRequest)
-          state.httpFriendRequest.splice(state.httpFriendRequest.indexOf(i), 1)
-          state.friendRequestLength--
+          state.httpFriendRequest.splice(state.httpFriendRequest.indexOf(i), 1);
+          state.friendRequestLength--;
         }
-       
+
         // state.httpFriendRequest.splice(state.httpFriendRequest.index)
       }
       // console.log('index888', id, state.httpFriendRequest)
     },
     [types.REMOVE_ADD_REQUEST_ONE]: (state, id) => {
-      console.log('vuex REMOVE_ADD_REQUEST_ONE:', state.httpFriendRequest.indexOf(id))
-      state.httpFriendRequest.splice(state.httpFriendRequest.indexOf(id), 1)
-      state.friendRequestLength--
+      console.log(
+        "vuex REMOVE_ADD_REQUEST_ONE:",
+        state.httpFriendRequest.indexOf(id)
+      );
+      state.httpFriendRequest.splice(state.httpFriendRequest.indexOf(id), 1);
+      state.friendRequestLength--;
       // console.log('', id)
     },
     [types.GET_FRIEND_POSTS]: (state, payload) => {
       // console.log('vuex mutauion types.GET_FRIEND_POSTS', payload)
       if (!payload.success) {
-        state.posts.push(...payload)
+        state.posts.push(...payload);
       } else {
-        return
+        return;
       }
     },
-    'addComment': (state, payload) => {
-       let posts = state.posts
+    addComment: (state, payload) => {
+      let posts = state.posts;
       for (let i = 0; i < posts.length; i++) {
         if (posts[i]._id == payload.post) {
           posts[i].comments.push(payload);
-       }
+        }
       }
-      console.log('vuex comment posts', posts)
-
+      // console.log("vuex comment posts", posts);
     },
     [types.GET_COMMENTS]: (state, payload) => {
-      console.log('vuex mutation GET_COMMENT', payload)
-      state.comments.push(payload)
-    }
+      console.log("vuex mutation GET_COMMENT", payload);
+      state.comments.push(payload);
+    },
   },
-
 
   actions: {
     signup: ({ commit }, payload) => {
@@ -256,13 +262,11 @@ export default new Vuex.Store({
             },
           })
           .then((res) => {
-            resolve(res)
+            resolve(res);
             // console.log('vuex index', res)
             commit("get-Posts-Http", res);
-
           });
-      })
-      
+      });
     },
     getUserSearchPic({ commit }, id) {
       axios
@@ -295,11 +299,9 @@ export default new Vuex.Store({
         .then((response) => {
           if (response) {
             commit(types.ADD_REQUEST, id);
-            socket.emit('new-fr-req', id)
-            socket.emit('get-fr-req-data', id)
-
+            socket.emit("new-fr-req", id);
+            socket.emit("get-fr-req-data", id);
           }
-
         });
     },
 
@@ -356,66 +358,75 @@ export default new Vuex.Store({
     },
     [types.REMOVE_SUBMITTED_REQUEST_FRIEND]: ({ commit }, id) => {
       let storage = localStorage.getItem("friendRequest");
-      let arr = storage.split(',')
+      let arr = storage.split(",");
 
-      axios.post("http://localhost:3000/friend-request/remove-submitted-user", { id }, {
-        headers: {
-          authorization: localStorage.getItem("token"),
-        }
-      }).then((res) => {
-        if (res.data.success) {
-          arr.find((item) => {
-            if (item == id) {
-              arr.splice(arr.indexOf(item), 1)
-              arr.join(',')
-              localStorage.setItem('friendRequest', arr)
-            }
-          })
-          commit(types.REMOVE_SUBMITTED_REQUEST_FRIEND, res.data.success)
-        }
-
-      })
-
+      axios
+        .post(
+          "http://localhost:3000/friend-request/remove-submitted-user",
+          { id },
+          {
+            headers: {
+              authorization: localStorage.getItem("token"),
+            },
+          }
+        )
+        .then((res) => {
+          if (res.data.success) {
+            arr.find((item) => {
+              if (item == id) {
+                arr.splice(arr.indexOf(item), 1);
+                arr.join(",");
+                localStorage.setItem("friendRequest", arr);
+              }
+            });
+            commit(types.REMOVE_SUBMITTED_REQUEST_FRIEND, res.data.success);
+          }
+        });
     },
     [types.REMOVE_ADD_REQUEST_ONE]: ({ commit }, id) => {
-      axios.post('http://localhost:3000/friend-request/remove-request-user-one', { id },
-        {
-          headers: {
-            authorization: localStorage.getItem("token"),
-        }
-        }).then(res => {
-          commit(types.REMOVE_ADD_REQUEST_ONE, res.data)
-      })
+      axios
+        .post(
+          "http://localhost:3000/friend-request/remove-request-user-one",
+          { id },
+          {
+            headers: {
+              authorization: localStorage.getItem("token"),
+            },
+          }
+        )
+        .then((res) => {
+          commit(types.REMOVE_ADD_REQUEST_ONE, res.data);
+        });
     },
-    [types.GET_FRIEND_POSTS]: ({commit}, index) => {
-       axios.get('http://localhost:3000/post/friends-post',
-        {
+    [types.GET_FRIEND_POSTS]: ({ commit }, index) => {
+      axios
+        .get("http://localhost:3000/post/friends-post", {
           headers: {
             index2: index,
             authorization: localStorage.getItem("token"),
-          }
-        }).then(res => {
-          commit(types.GET_FRIEND_POSTS, res.data)
+          },
         })
+        .then((res) => {
+          commit(types.GET_FRIEND_POSTS, res.data);
+        });
     },
     [types.ADD_COMMENT]: ({ commit }, { comment, postID }) => {
-      socket.emit('new-comment', { comment, postID })
-      commit(types.ADD_COMMENT, { comment, postID})
+      socket.emit("new-comment", { comment, postID });
+      commit(types.ADD_COMMENT, { comment, postID });
     },
-    
 
     [types.GET_COMMENTS]: ({ commit }, index) => {
-      axios.get('http://localhost:3000/comment/get-comments',
-        {
+      axios
+        .get("http://localhost:3000/comment/get-comments", {
           headers: {
             postid: index,
             authorization: localStorage.getItem("token"),
-          }
-        }).then(res => {
-           console.log('vuex types.GET_COMMENTS', res.data)
-          commit(types.GET_COMMENTS, res.data)
+          },
         })
+        .then((res) => {
+          console.log("vuex types.GET_COMMENTS", res.data);
+          commit(types.GET_COMMENTS, res.data);
+        });
     },
-
-  }
+  },
 });

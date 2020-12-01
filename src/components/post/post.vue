@@ -179,18 +179,16 @@ export default {
       },
     showPosts() {
       this.showHidePosts = !this.showHidePosts;
+      this.$store.getters.getPosts
     },
   },
  created() {
    
    this.socket.on('new-comment',  data => {
-     console.log('post.veu data', data)
+     console.log('post.veu new-comment 11', data)
      this.$store.commit('addComment', data)
    })
-  //  this.socket.on('new-comment', (d) => {
-  //     this.$store.commit('addComment', d)
-  //     console.log('App vue socket new-comment', d)
-  //   })
+
  }
 };
 </script>
